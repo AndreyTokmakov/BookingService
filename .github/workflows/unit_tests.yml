@@ -35,7 +35,7 @@ jobs:
       - name: Install Packages
         run: |
             sudo apt-get update -qq
-            sudo apt-get install build-essential cmake
+            sudo apt-get install build-essential cmake make
             sudo apt install libboost-all-dev
 
       - name: Build and compile
@@ -45,3 +45,4 @@ jobs:
           pwd
           ls -l
           cmake ..
+          make
