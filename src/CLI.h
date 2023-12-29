@@ -19,19 +19,36 @@ namespace CLI
 {
     using namespace std::string_view_literals;
 
-    struct Handler
+    class SimpleCLI
     {
-        Booking::BookingService& service;
-        std::basic_ostream<char>& outStream;
+    public:
+        SimpleCLI(Booking::BookingService &service,
+                  std::basic_ostream<char> &out = std::cout);
 
-        std::optional<Booking::Theater> theaterSelected { std::nullopt };
-        std::optional<Booking::Movie> movieSelected { std::nullopt };
-
-        Handler(Booking::BookingService& service,
-                std::basic_ostream<char>& out = std::cout);
+        enum class Status {
+            Ok,
+            Continue,
+            Stop
+        };
 
         [[nodiscard]]
-        bool debug(std::string_view name);
+        Status processCommand(std::string_view userInput);
+
+        void start();
+
+    private:
+
+        using CmdHandlerType = SimpleCLI;
+        using methodPtr_t = bool (CmdHandlerType::*)(std::string_view params);
+
+        template<typename... Args>
+        bool calFunction(methodPtr_t func, Args&&... params)
+        {
+            return std::invoke(func , this, std::forward<Args>(params)...);
+        }
+
+        [[nodiscard]]
+        bool book_seats(std::string_view name);
 
         [[nodiscard]]
         bool findTheaters(std::string_view name);
@@ -50,28 +67,10 @@ namespace CLI
 
         [[nodiscard]]
         bool printMovies(std::string_view);
-    };
-
-
-    class SimpleCLI
-    {
-        using HandlerType = Handler;
-        using methodPtr_t = bool (HandlerType::*)(std::string_view params);
-
-        enum class Status {
-            Ok,
-            Continue,
-            Stop
-        };
-
-        template<typename... Args>
-        bool calFunction(methodPtr_t func, Args&&... params)
-        {
-            return std::invoke(func , handlerPtr, std::forward<Args>(params)...);
-        }
 
         [[nodiscard]]
-        static std::vector<std::string_view> splitCommand(std::string_view input);
+        static std::vector<std::string_view> split(std::string_view input,
+                                                   std::string_view delim = " "sv);
 
         [[nodiscard]]
         static std::pair<std::string_view, std::string_view> extractCommand(std::string_view input);
@@ -79,30 +78,29 @@ namespace CLI
         [[nodiscard]]
         Status validateCommand(std::string_view command) const;
 
-    public:
-        explicit SimpleCLI(HandlerType *ptr, std::basic_ostream<char>& out = std::cout);
-        void start();
-
         [[nodiscard]]
-        Status processCommand(std::string_view userInput);
+        bool isPremiereExist(const Booking::Theater& theater,
+                             const Booking::Movie& movie) const noexcept;
 
     private:
 
         static inline const std::unordered_map<std::string_view, methodPtr_t> funcMapping
-        {
-            {"debug"sv, &HandlerType::debug},
-            {"find_theaters"sv, &HandlerType::findTheaters},
-            {"select_theater"sv, &HandlerType::selectTheater},
-            {"select_movie"sv, &HandlerType::selectMovie},
-            {"list_available_seats"sv, &HandlerType::listAvailableSeats},
-            {"list_theaters"sv, &HandlerType::printTheaters},
-            {"list_movies"sv, &HandlerType::printMovies},
-        };
+                {
+                        {"book_seats"sv, &CmdHandlerType::book_seats},
+                        {"find_theaters"sv, &CmdHandlerType::findTheaters},
+                        {"select_theater"sv, &CmdHandlerType::selectTheater},
+                        {"select_movie"sv, &CmdHandlerType::selectMovie},
+                        {"list_available_seats"sv, &CmdHandlerType::listAvailableSeats},
+                        {"list_theaters"sv, &CmdHandlerType::printTheaters},
+                        {"list_movies"sv, &CmdHandlerType::printMovies},
+                };
 
-        HandlerType *handlerPtr;
+        Booking::BookingService& service;
         std::basic_ostream<char>& outStream;
-    };
 
+        std::optional<Booking::Theater> theaterSelected { std::nullopt };
+        std::optional<Booking::Movie> movieSelected { std::nullopt };
+    };
 };
 
 #endif //BOOKINGSERVICE_CLI_H

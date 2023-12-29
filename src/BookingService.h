@@ -18,7 +18,7 @@ Description : BookingService.h
 
 namespace Booking
 {
-    enum class SeatStatus {
+    enum class SeatStatus: bool {
         Available,
         Booked
     };

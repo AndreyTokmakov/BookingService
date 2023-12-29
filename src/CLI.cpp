@@ -10,33 +10,60 @@ Description : CLI.cpp
 #include "CLI.h"
 #include <iostream>
 #include <iomanip>
+#include <charconv>
 
 namespace CLI
 {
     using namespace std::string_view_literals;
     using namespace Booking;
 
-    Handler::Handler(Booking::BookingService& service, std::basic_ostream<char>& out):
+    SimpleCLI::SimpleCLI(BookingService &service, std::basic_ostream<char> &out) :
             service{service }, outStream {out} {
     }
 
-    bool Handler::debug(std::string_view name)
+    bool SimpleCLI::book_seats(std::string_view params)
     {
-        if (name.empty()) {
-            outStream << "Movie name expected\n";
-            return false;
+        if (params.empty()) {
+            outStream << "Seats numbers expected\n";
+            return true;
+        } else if (!movieSelected || !theaterSelected) {
+            outStream << "No theater or Movie selected\n";
+            return true;
         }
 
-        if (movieSelected.has_value() && theaterSelected.has_value())
-        {
-            outStream<< "Movie  : " << movieSelected.value() << std::endl;
-            outStream << "Theater: " << theaterSelected.value() << std::endl;
+        std::vector<uint16_t> seatsToBook;
+        auto extractSeats = [&seatsToBook](const std::vector<std::string_view>& parts){
+            for (const std::string_view& seatNum: parts) {
+                const auto [_, error] =
+                        std::from_chars(seatNum.data(), seatNum.data() + seatNum.size(), seatsToBook.emplace_back());
+                if (error != std::errc{})
+                    return false;
+            }
+            return true;
+        };
+
+        bool parsed = false;
+        if (std::string_view::npos != params.find(','))
+            parsed = extractSeats(split(params, ","));
+        else
+            parsed = extractSeats({params});
+
+        if (!parsed) {
+            outStream << "Incorrect syntax: '" << params << "'. Format expected: [1,2,3,4,5] or [1]";
+            return true;
+        }
+
+        const auto premiere = service.getPremiere(theaterSelected.value(), movieSelected.value());
+        if (!premiere.value()->bookSeats(seatsToBook)) {
+            outStream << "Sorry: Failed to book seats: " << params << std::endl;
+        } else {
+            outStream << "Seats " << params  << " are booked\n";
         }
 
         return true;
     }
 
-    bool Handler::listAvailableSeats(std::string_view)
+    bool SimpleCLI::listAvailableSeats(std::string_view)
     {
         if (!movieSelected) {
             outStream << "Please select a Movie to see the available slots\n";
@@ -52,7 +79,7 @@ namespace CLI
         return true;
     }
 
-    bool Handler::findTheaters(std::string_view name)
+    bool SimpleCLI::findTheaters(std::string_view name)
     {
         if (name.empty()) {
             outStream << "Movie name expected\n";
@@ -68,20 +95,30 @@ namespace CLI
         return true;
     }
 
-    bool Handler::selectTheater(std::string_view name)
+    bool SimpleCLI::isPremiereExist(const Booking::Theater& theater,
+                                    const Booking::Movie& movie) const noexcept
+    {
+        if (!service.getPremiere(theater,movie).has_value()) {
+            outStream << "Unfortunately, the " << movie << " movie is not being shown at the " << theater << " cinema\n";
+            return false;
+        }
+        return true;
+    }
+
+    bool SimpleCLI::selectTheater(std::string_view name)
     {
         theaterSelected.reset();
         if (name.empty()) {
             outStream << "Theater name expected\n";
             return false;
+        } else if (movieSelected && !isPremiereExist( {name.data() },movieSelected.value())) {
+            return true;
         }
-
-        // TODO: Check match
 
         const std::vector<Theater> allTheaters = service.getTheaters();
         if (const auto iter = std::find_if(allTheaters.cbegin(), allTheaters.cend(), [&](const Theater& theater) {
                 return theater.name == name;
-        }); allTheaters.end() != iter) {
+            }); allTheaters.end() != iter) {
             theaterSelected = *iter;
             outStream << "The " << theaterSelected.value() << " theater is chosen\n";
         } else {
@@ -90,24 +127,19 @@ namespace CLI
         return true;
     }
 
-    bool Handler::selectMovie(std::string_view name)
+    bool SimpleCLI::selectMovie(std::string_view name)
     {
         movieSelected.reset();
         if (name.empty()) {
             outStream << "Movie name expected\n";
             return false;
-        }
-
-        const Movie movie {name.data() };
-        if (theaterSelected && !service.getPremiere(theaterSelected.value(), movie).has_value()) {
-            outStream << "Unfortunately, the " << *theaterSelected << " movie is not being shown at the "
-                      << movie << " cinema\n";
+        } else if (theaterSelected && !isPremiereExist(theaterSelected.value(),  {name.data() })) {
             return true;
         }
 
         const std::vector<Booking::Movie> movies = service.getAllPlayingMovies();
         if (const auto iter = std::find_if(movies.cbegin(), movies.cend(), [&](const Booking::Movie& mov) {
-                return mov.name == movie.name;
+                return mov.name == name;
             }); movies.end() != iter) {
             movieSelected = *iter;
             outStream << "The " << movieSelected.value() << " movie is chosen\n";
@@ -117,7 +149,7 @@ namespace CLI
         return true;
     }
 
-    bool Handler::printTheaters(std::string_view)
+    bool SimpleCLI::printTheaters(std::string_view)
     {
         const std::vector<Booking::Theater> allTheaters = service.getTheaters();
         for (const auto& theater: allTheaters)
@@ -126,7 +158,7 @@ namespace CLI
         return true;
     }
 
-    bool Handler::printMovies(std::string_view)
+    bool SimpleCLI::printMovies(std::string_view)
     {
         const std::vector<Booking::Movie> allMovies = service.getAllPlayingMovies();
         for (const auto& movie: allMovies)
@@ -134,19 +166,13 @@ namespace CLI
 
         return true;
     }
-}
 
-namespace CLI
-{
-    SimpleCLI::SimpleCLI(SimpleCLI::HandlerType *ptr, std::basic_ostream<char>& out):
-            handlerPtr { ptr }, outStream {out} {
-    }
-
-    std::vector<std::string_view> SimpleCLI::splitCommand(std::string_view input)
+    std::vector<std::string_view> SimpleCLI::split(std::string_view input,
+                                                   std::string_view delim)
     {
         std::vector<std::string_view> output;
         for (size_t first = 0, size = input.size(), second = 0; first < size; ) {
-            second = input.find(' ', first);
+            second = input.find(delim, first);
             if (first != second)
                 output.emplace_back(input.substr(first, second - first));
             if (second == std::string_view::npos)
@@ -197,7 +223,7 @@ namespace CLI
                 return Status::Continue;
         }
 
-        outStream << "Invalid command " << std::quoted(cmd) << std::endl;
+        outStream << "Invalid command '" << cmd << "'\n";
         return Status::Continue;
     }
 

@@ -46,7 +46,7 @@ namespace Tests
     {
         service.initialize();
 
-        std::vector<uint16_t> seats = service.getSeatsAvailable({"4DX"}, {"Fight Club"});
+        std::vector<uint16_t> seats = service.getSeatsAvailable( {"4DX"}, Movie{"Fight Club"});
         std::cout <<seats << std::endl;
     }
 
@@ -92,19 +92,8 @@ int main([[maybe_unused]] int argc,
     Booking::BookingService service;
     service.initialize();
 
-    std::stringstream ss;
-    CLI::Handler handler {service, ss};
-    CLI::SimpleCLI cli (&handler, ss);
-    // cli.start();
-
-    cli.processCommand("select_theater 4DX");
-    std::cout << ss.str() << std::endl; ss.str("");
-
-    cli.processCommand("select_movie Fight Club");
-    std::cout << ss.str() << std::endl; ss.str("");
-
-    cli.processCommand("list_available_seats");
-    std::cout << ss.str() << std::endl; ss.str("");
+    CLI::SimpleCLI cli (service);
+    cli.start();
 
     return EXIT_SUCCESS;
 }

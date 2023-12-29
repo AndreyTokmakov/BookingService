@@ -43,7 +43,7 @@ namespace Booking
 namespace Booking
 {
     Premiere::Premiere(std::shared_ptr<Theater> theater, std::shared_ptr<Movie> movie):
-        theater { std::move(theater) }, movie { std::move(movie) } {
+            theater { std::move(theater) }, movie { std::move(movie) } {
     }
 
     std::vector<uint16_t> Premiere::getSeatsAvailable() const noexcept
@@ -198,5 +198,6 @@ namespace Booking
         scheduleMovie("Fight Club", "4DX") ;
         scheduleMovie("Fight Club", "Electric Cinema");
         scheduleMovie("The Green Mile", "4DX");
+        scheduleMovie("Terminator", "4DX");
     }
 }
