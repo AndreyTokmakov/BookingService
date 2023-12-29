@@ -40,6 +40,8 @@ jobs:
 
       - name: Build and compile
         run: |
+          ls -l
           mkdir build && cd build
+          pwd
+          ls -l
           cmake ..
-          build
