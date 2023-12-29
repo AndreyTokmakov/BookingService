@@ -41,3 +41,5 @@ jobs:
         run: |
           mkdir build
           cd build
+          ls -l
+          pwd
