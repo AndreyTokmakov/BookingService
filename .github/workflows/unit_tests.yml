@@ -35,7 +35,7 @@ jobs:
       - name: Install Packages
         run: |
             sudo apt-get update -qq
-            sudo apt-get install build-essentials cmake
+            sudo apt-get install build-essential cmake
 
       - name: Build and compile
         run: |
