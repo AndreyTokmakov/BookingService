@@ -102,12 +102,6 @@ namespace CLI
         return true;
     }
 
-    bool SimpleCLI::listPlayingMovies(std::string_view)
-    {
-        return true;
-    }
-
-
     bool SimpleCLI::selectTheater(std::string_view name)
     {
         theaterSelected.reset();
@@ -165,6 +159,15 @@ namespace CLI
     bool SimpleCLI::listAllMovies(std::string_view)
     {
         const std::vector<Booking::Movie*> allMovies = service.getMovies();
+        for (const auto& movie: allMovies)
+            outStream << '\t' << movie->name << std::endl;
+
+        return true;
+    }
+
+    bool SimpleCLI::listPlayingMovies(std::string_view)
+    {
+        const std::vector<Booking::Movie*> allMovies = service.getPlayingMovies();
         for (const auto& movie: allMovies)
             outStream << '\t' << movie->name << std::endl;
 

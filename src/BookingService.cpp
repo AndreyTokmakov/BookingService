@@ -10,6 +10,7 @@ Description : BookingService.cpp
 #include "BookingService.h"
 #include <algorithm>
 #include <iostream>
+#include <unordered_set>
 
 namespace Booking
 {
@@ -77,7 +78,15 @@ namespace Booking
     [[nodiscard]]
     std::vector<Movie*> BookingService::getPlayingMovies() const
     {
+        std::unordered_set<size_t> idMovies;
+        for (const PremierePtr& premiere: bookingSchedule)
+            idMovies.insert(premiere->movieId);
+
         std::vector<Movie*> playingMovies;
+        playingMovies.reserve(idMovies.size());
+        for (size_t id: idMovies)
+            playingMovies.push_back(movies.findEntryByID(id).value());
+
         return playingMovies;
     }
 
@@ -205,5 +214,6 @@ namespace Booking
         scheduleMovie("Fight Club", "Electric Cinema");
         scheduleMovie("The Green Mile", "4DX");
         scheduleMovie("Terminator", "4DX");
+        scheduleMovie("Inception", "Odeon");
     }
 }
