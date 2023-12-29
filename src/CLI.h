@@ -54,6 +54,9 @@ namespace CLI
         bool findTheaters(std::string_view name);
 
         [[nodiscard]]
+        bool listPlayingMovies(std::string_view);
+
+        [[nodiscard]]
         bool selectTheater(std::string_view name);
 
         [[nodiscard]]
@@ -63,10 +66,10 @@ namespace CLI
         bool listAvailableSeats(std::string_view name);
 
         [[nodiscard]]
-        bool printTheaters(std::string_view);
+        bool listAllTheaters(std::string_view);
 
         [[nodiscard]]
-        bool printMovies(std::string_view);
+        bool listAllMovies(std::string_view);
 
         [[nodiscard]]
         static std::vector<std::string_view> split(std::string_view input,
@@ -78,28 +81,25 @@ namespace CLI
         [[nodiscard]]
         Status validateCommand(std::string_view command) const;
 
-        [[nodiscard]]
-        bool isPremiereExist(const Booking::Theater& theater,
-                             const Booking::Movie& movie) const noexcept;
-
     private:
 
         static inline const std::unordered_map<std::string_view, methodPtr_t> funcMapping
-                {
-                        {"book_seats"sv, &CmdHandlerType::book_seats},
-                        {"find_theaters"sv, &CmdHandlerType::findTheaters},
-                        {"select_theater"sv, &CmdHandlerType::selectTheater},
-                        {"select_movie"sv, &CmdHandlerType::selectMovie},
-                        {"list_available_seats"sv, &CmdHandlerType::listAvailableSeats},
-                        {"list_theaters"sv, &CmdHandlerType::printTheaters},
-                        {"list_movies"sv, &CmdHandlerType::printMovies},
-                };
+        {
+            {"book_seats"sv, &CmdHandlerType::book_seats},
+            {"find_theaters"sv, &CmdHandlerType::findTheaters},
+            {"list_playing_movies"sv, &CmdHandlerType::listPlayingMovies},
+            {"select_theater"sv, &CmdHandlerType::selectTheater},
+            {"select_movie"sv, &CmdHandlerType::selectMovie},
+            {"list_available_seats"sv, &CmdHandlerType::listAvailableSeats},
+            {"list_theaters"sv, &CmdHandlerType::listAllTheaters},
+            {"list_movies"sv, &CmdHandlerType::listAllMovies},
+       };
 
         Booking::BookingService& service;
         std::basic_ostream<char>& outStream;
 
-        std::optional<Booking::Theater> theaterSelected { std::nullopt };
-        std::optional<Booking::Movie> movieSelected { std::nullopt };
+        std::optional<Booking::Theater*> theaterSelected { std::nullopt };
+        std::optional<Booking::Movie*> movieSelected { std::nullopt };
     };
 };
 

@@ -21,6 +21,8 @@ add_executable(tests
         ${SRC_DIR}/BookingService.cpp
         ${SRC_DIR}/CLI.cpp
         ${SRC_DIR}/CLI.h
+        ${SRC_DIR}/Database.cpp
+        ${SRC_DIR}/Database.h
 )
 
 TARGET_LINK_LIBRARIES(tests boost_unit_test_framework)

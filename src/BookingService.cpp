@@ -13,37 +13,8 @@ Description : BookingService.cpp
 
 namespace Booking
 {
-    std::ostream& operator<<(std::ostream& stream, const Movie& movie) {
-        stream << movie.name;
-        return stream;
-    }
-
-    std::ostream& operator<<(std::ostream& stream, const Theater& theater) {
-        stream << theater.name;
-        return stream;
-    }
-
-    std::ostream& operator<<(std::ostream& stream, const Premiere& premiere) {
-        stream << "Theatre: " << *premiere.theater << ", Movie: " << *premiere.movie << ". Seats available: ";
-        for (int seatNum = 1; SeatStatus status: premiere.seats) {
-            if (SeatStatus::Available == status)
-                stream << seatNum << ' ';
-            ++seatNum;
-        }
-        return stream;
-    }
-
-    std::ostream& operator<<(std::ostream& stream, const std::vector<uint16_t>& values) {
-        for (uint16_t seatNum: values)
-            stream << seatNum << " ";
-        return stream;
-    }
-}
-
-namespace Booking
-{
-    Premiere::Premiere(std::shared_ptr<Theater> theater, std::shared_ptr<Movie> movie):
-            theater { std::move(theater) }, movie { std::move(movie) } {
+    Premiere::Premiere(const Theater& theater, const Movie& movie):
+            theaterId { theater.id }, movieId { movie.id} {
     }
 
     std::vector<uint16_t> Premiere::getSeatsAvailable() const noexcept
@@ -81,48 +52,78 @@ namespace Booking
 
 namespace Booking
 {
-    // TODO: --> std::vector<std::string_view> ??
-    std::vector<Movie> BookingService::getAllPlayingMovies() const
+    std::vector<Movie*> BookingService::getMovies() const
     {
-        std::vector<Movie> allMovies;
-        allMovies.reserve(movies.size());
-        for (const MoviePtr& mov: movies)
-            allMovies.push_back(*mov);
-        return allMovies;
+        return movies.getAllEntries();
     }
 
-    std::vector<Theater> BookingService::getTheaters() const
+    std::vector<Theater*> BookingService::getTheaters() const
     {
-        std::vector<Theater> allTheaters;
-        allTheaters.reserve(movies.size());
-        for (const TheaterPtr& theater: theaters)
-            allTheaters.push_back(*theater);
-        return allTheaters;
+        return theaters.getAllEntries();
     }
 
-    std::vector<Theater> BookingService::getTheatersByMovie(const Movie& movie) const
+    std::optional<Movie*>
+    BookingService::findMovie(const std::string& name) const
     {
-        std::vector<Theater> allTheaters;
-        for (const PremierePtr & premiere: bookingSchedule)
-            if (premiere->movie->name == movie.name)
-                allTheaters.push_back(*premiere->theater);
-        return allTheaters;
+        return movies.findEntryName(name);
     }
 
-    // TODO: Refactor ?? ID's <-> HashTable
+    std::optional<Theater*>
+    BookingService::findTheater(const std::string& name) const
+    {
+        return theaters.findEntryName(name);
+    }
+
+    [[nodiscard]]
+    std::vector<Movie*> BookingService::getPlayingMovies() const
+    {
+        std::vector<Movie*> playingMovies;
+        return playingMovies;
+    }
+
+    std::vector<Theater*> BookingService::getTheatersByMovie(const std::string& movieName) const
+    {
+        std::vector<Theater*> theatersByMovie;
+        const std::optional<Movie*> movie = findMovie(movieName);
+        if (!movie)
+            return theatersByMovie;
+
+        for (const PremierePtr& premiere: bookingSchedule)
+            if (premiere->movieId == movie.value()->id)
+                theatersByMovie.push_back(theaters.findEntryByID(premiere->theaterId).value());
+
+        return theatersByMovie;
+    }
+
+    // TODO: To be used if we already have a DB-like objects of Theater and Movie
     std::optional<BookingService::PremierePtr>
-    BookingService::getPremiere(const Theater& theater,
-                                const Movie& movie) const
+    BookingService::getPremiere(const Theater* const theater,
+                                const Movie* const movie) const
     {
-        if (const auto premiereIter = std::find_if(bookingSchedule.cbegin(), bookingSchedule.cend(), [&](const auto& premiere) {
-                return *(premiere->theater) == theater && *(premiere->movie) == movie;
-            }); bookingSchedule.end() != premiereIter)
-            return std::make_optional<PremierePtr>(*premiereIter);
+        for (const PremierePtr& premiere: bookingSchedule) {
+            if (premiere->movieId == movie->id && premiere->theaterId == theater->id) {
+                return std::make_optional<PremierePtr>(premiere);
+            }
+        }
         return std::nullopt;
     }
 
-    std::vector<uint16_t> BookingService::getSeatsAvailable(const Theater& theater,
-                                                            const Movie& movie) const
+    std::optional<BookingService::PremierePtr>
+    BookingService::getPremiere(const std::string& theaterName,
+                                const std::string& movieName) const
+    {
+        const std::optional<Movie*> movie = findMovie(movieName);
+        if (!movie)
+            return std::nullopt;
+        const std::optional<Theater*> theater = findTheater(theaterName);
+        if (!movie)
+            return std::nullopt;
+
+        return getPremiere(theater.value(), movie.value());
+    }
+
+    std::vector<uint16_t> BookingService::getSeatsAvailable(const Theater* const theater,
+                                                            const Movie* const movie) const
     {
         const std::optional<PremierePtr> premiere { getPremiere(theater, movie) };
         if (!premiere.has_value())
@@ -131,32 +132,37 @@ namespace Booking
         return premiere.value()->getSeatsAvailable();
     }
 
+    std::vector<uint16_t> BookingService::getSeatsAvailable(const std::string& theaterName,
+                                                            const std::string& movieName) const
+    {
+        const std::optional<PremierePtr> premiere { getPremiere(theaterName, movieName) };
+        if (!premiere.has_value())
+            return {};
+
+        return premiere.value()->getSeatsAvailable();
+    }
+
     void BookingService::addMovie(const std::string& movieName)
     {
-        movies.push_back(std::make_shared<Movie>(movieName));
+        movies.addEntry(movieName);
     }
 
     void BookingService::addTheater(const std::string& theaterName)
     {
-        theaters.push_back(std::make_shared<Theater>(theaterName));
+        theaters.addEntry(theaterName);
     }
 
     bool BookingService::scheduleMovie(const std::string& movieName,
                                        const std::string& theaterName)
     {
-        const auto movie = std::find_if(movies.cbegin(), movies.cend(), [&](const auto& mov){
-            return mov->name  == movieName;
-        });
-        if (movies.end() == movie)
+        const std::optional<Movie*> movie { movies.findEntryName(movieName) };
+        if (!movie)
+            return false;
+        const std::optional<Theater*> theater { theaters.findEntryName(theaterName) };
+        if (!theater)
             return false;
 
-        const auto theater = std::find_if(theaters.cbegin(), theaters.cend(), [&](const auto& theater){
-            return theater->name  == theaterName;
-        });
-        if (theaters.end() == theater)
-            return false;
-
-        bookingSchedule.emplace_back(std::make_shared<Premiere>(*theater, *movie));
+        bookingSchedule.emplace_back(std::make_shared<Premiere>(*theater.value(), *movie.value()));
         return true;
     }
 

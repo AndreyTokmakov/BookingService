@@ -24,6 +24,7 @@ Description :
 #include <format>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "BookingService.h"
 #include "CLI.h"
@@ -34,23 +35,44 @@ Description :
 using namespace Booking;
 using namespace CLI;
 
-void insertTestData(Booking::BookingService& service)
-{
-    service.addMovie("Fight Club");
-    service.addMovie("Terminator");
-    service.addMovie("Inception");
+namespace {
+    void insertTestData(Booking::BookingService &service) {
+        service.addMovie("Fight Club");
+        service.addMovie("Terminator");
+        service.addMovie("Inception");
 
-    service.addTheater("4DX");
-    service.addTheater("Electric Cinema");
-    service.addTheater("Sun Pictures");
+        service.addTheater("4DX");
+        service.addTheater("Electric Cinema");
+        service.addTheater("Sun Pictures");
 
-    service.scheduleMovie("Fight Club", "4DX") ;
-    service.scheduleMovie("Fight Club", "Electric Cinema");
-    service.scheduleMovie("Terminator", "Sun Pictures");
-    service.scheduleMovie("Terminator", "4DX");
-    service.scheduleMovie("Inception", "Electric Cinema");
+        service.scheduleMovie("Fight Club", "4DX");
+        service.scheduleMovie("Fight Club", "Electric Cinema");
+        service.scheduleMovie("Terminator", "Sun Pictures");
+        service.scheduleMovie("Terminator", "4DX");
+        service.scheduleMovie("Inception", "Electric Cinema");
+    }
+
+    std::vector<std::string> splitAndTrimOutput(const std::string &output) {
+        std::vector<std::string> result;
+        boost::split(result, output, boost::is_any_of("\n"));
+        for (auto &s: result)
+            boost::trim(s);
+        return result;
+    }
+
+    void validateMultilineOutput(const std::string& output,
+                                 const std::vector<std::string>& subStrExpected)
+    {
+        const std::vector<std::string> outLines { splitAndTrimOutput(output)};
+        for (const std::string& text: subStrExpected)
+        {
+            const bool exits = std::any_of(outLines.cbegin(), outLines.cend(), [&](const auto& str) {
+                return str.find(text) != std::string::npos;
+            });
+            BOOST_CHECK_EQUAL(exits, true);
+        }
+    }
 }
-
 
 struct BaseFixture
 {
@@ -97,13 +119,13 @@ struct BookingCLIFixture : CLIFixture
 
 BOOST_FIXTURE_TEST_SUITE(SchedulerTests, BaseFixture)
 
-    BOOST_AUTO_TEST_CASE(TestGetAllPlayingMovies)
+    BOOST_AUTO_TEST_CASE(TestGetAllMovies)
     {
-        std::vector<Movie> movies = service.getAllPlayingMovies();
+        std::vector<Movie*> movies = service.getMovies();
         for (const std::string& movieName: std::vector<std::string>{"Fight Club", "Terminator", "Inception"})
         {
             const bool exits = std::any_of(movies.cbegin(), movies.cend(), [&](const auto& movie) {
-                return movie.name == movieName;
+                return movie->name == movieName;
             });
             BOOST_CHECK_EQUAL(exits, true);
         }
@@ -111,11 +133,11 @@ BOOST_FIXTURE_TEST_SUITE(SchedulerTests, BaseFixture)
 
     BOOST_AUTO_TEST_CASE(TestGetAlltheaters)
     {
-        const std::vector<Theater> theaters = service.getTheaters();
+        const std::vector<Theater*> theaters = service.getTheaters();
         for (const std::string& theaterName: std::vector<std::string>{"4DX", "Electric Cinema", "Sun Pictures"})
         {
             const bool exits = std::any_of(theaters.cbegin(), theaters.cend(), [&](const auto& theater) {
-                return theater.name == theaterName;
+                return theater->name == theaterName;
             });
             BOOST_CHECK_EQUAL(exits, true);
         }
@@ -123,14 +145,13 @@ BOOST_FIXTURE_TEST_SUITE(SchedulerTests, BaseFixture)
 
     BOOST_AUTO_TEST_CASE(TestGetTheatersPlayingMovies)
     {
-        const Movie movie { "Fight Club" };
-        const std::vector<Theater> theaters = service.getTheatersByMovie(movie);
+        const std::vector<Theater*> theaters = service.getTheatersByMovie("Fight Club" );
 
         BOOST_CHECK_EQUAL(theaters.size(), 2);
         for (const std::string& theaterName: std::vector<std::string>{"4DX", "Electric Cinema"})
         {
             const bool exits = std::any_of(theaters.cbegin(), theaters.cend(), [&](const auto& theater) {
-                return theater.name == theaterName;
+                return theater->name == theaterName;
             });
             BOOST_CHECK_EQUAL(exits, true);
         }
@@ -138,13 +159,14 @@ BOOST_FIXTURE_TEST_SUITE(SchedulerTests, BaseFixture)
 
     BOOST_AUTO_TEST_CASE(TestGetSeatsAvailable)
     {
-        const std::vector<uint16_t> seats = service.getSeatsAvailable({"4DX"}, {"Fight Club"});
+        // TODO: str literals
+        const std::vector<uint16_t> seats = service.getSeatsAvailable("4DX", "Fight Club");
         BOOST_CHECK_EQUAL(seats.size(), 20);
     }
 
     BOOST_AUTO_TEST_CASE(TestGetSeatsAvailable_Premiere)
     {
-        const auto premiere = service.getPremiere({"4DX"}, {"Fight Club"});
+        const auto premiere = service.getPremiere("4DX", "Fight Club");
         BOOST_CHECK_EQUAL(premiere.has_value(), true);
 
         const std::vector<uint16_t> seats = premiere.value()->getSeatsAvailable();
@@ -153,7 +175,7 @@ BOOST_FIXTURE_TEST_SUITE(SchedulerTests, BaseFixture)
 
     BOOST_AUTO_TEST_CASE(TestBookSeatsAndGetSeatsAvailable)
     {
-        const auto premiere = service.getPremiere({"4DX"}, {"Fight Club"});
+        const auto premiere = service.getPremiere("4DX", "Fight Club");
         BOOST_CHECK_EQUAL(premiere.has_value(), true);
 
         std::vector<uint16_t> seats = premiere.value()->getSeatsAvailable();
@@ -168,6 +190,7 @@ BOOST_FIXTURE_TEST_SUITE(SchedulerTests, BaseFixture)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
 
     BOOST_FIXTURE_TEST_CASE(RunUnknownCommand, CLIFixture)
@@ -176,6 +199,26 @@ BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
         BOOST_CHECK(status == SimpleCLI::Status::Continue);
         CHECK_CONTAINS(output, "Invalid command 'avada_kedavra'");
     }
+
+    BOOST_FIXTURE_TEST_CASE(FindTheatres_ShowingMovie_Ok, CLIFixture)
+    {
+        const auto [output, status] = sendCommand("find_theaters Terminator");
+        BOOST_CHECK(status == SimpleCLI::Status::Continue);
+        validateMultilineOutput(output,{
+                "The movie 'Terminator' is being shown in", "4DX", "Sun Pictures"
+        });
+    }
+
+    BOOST_FIXTURE_TEST_CASE(FindTheatres_ShowingMovie_Ok2, CLIFixture)
+    {
+        const auto [output, status] = sendCommand("find_theaters Fight Club");
+        BOOST_CHECK(status == SimpleCLI::Status::Continue);
+        validateMultilineOutput(output,{
+            "The movie 'Fight Club' is being shown in", "4DX", "Electric Cinema"
+        });
+    }
+
+    // list playing movies
 
     BOOST_FIXTURE_TEST_CASE(SelectTheater_Exising, CLIFixture)
     {
@@ -249,6 +292,19 @@ BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
         CHECK_CONTAINS(output, "Unfortunately, the Terminator movie is not being shown at the Electric Cinema cinema");
     }
 
+    BOOST_FIXTURE_TEST_CASE(SelectMovieAndTheater_Failed_Retry, CLIFixture)
+    {
+        auto [output, status] = sendCommand("select_movie Terminator");
+        CHECK_CONTAINS(output, "The Terminator movie is chosen");
+
+        std::tie(output, status) = sendCommand("select_theater Electric Cinema");
+        CHECK_CONTAINS(output, "Unfortunately, the Terminator movie is not being shown at the Electric Cinema cinema");
+
+        std::tie(output, status) = sendCommand("select_theater 4DX");
+        BOOST_CHECK(status == SimpleCLI::Status::Continue);
+        CHECK_CONTAINS(output, "The 4DX theater is chosen");
+    }
+
     BOOST_FIXTURE_TEST_CASE(SelectTheaterAndMovie_NotShownInTheater, CLIFixture)
     {
         auto [output, status] = sendCommand("select_theater 4DX");
@@ -257,6 +313,20 @@ BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
         std::tie(output, status) = sendCommand("select_movie Inception");
         BOOST_CHECK(status == SimpleCLI::Status::Continue);
         CHECK_CONTAINS(output, "Unfortunately, the Inception movie is not being shown at the 4DX cinema");
+    }
+
+    BOOST_FIXTURE_TEST_CASE(SelectTheaterAndMovie_Failed_Retry, CLIFixture)
+    {
+        auto [output, status] = sendCommand("select_theater 4DX");
+        CHECK_CONTAINS(output, "The 4DX theater is chosen");
+
+        std::tie(output, status) = sendCommand("select_movie Inception");
+        BOOST_CHECK(status == SimpleCLI::Status::Continue);
+        CHECK_CONTAINS(output, "Unfortunately, the Inception movie is not being shown at the 4DX cinema");
+
+        std::tie(output, status) = sendCommand("select_movie Terminator");
+        BOOST_CHECK(status == SimpleCLI::Status::Continue);
+        CHECK_CONTAINS(output, "The Terminator movie is chosen");
     }
 
     BOOST_FIXTURE_TEST_CASE(GetSeatsAvailalbe, CLIFixture)
@@ -289,7 +359,6 @@ BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
 

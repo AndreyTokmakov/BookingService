@@ -54,9 +54,9 @@ namespace PocoService
                            [[maybe_unused]] Poco::Net::HTTPServerResponse &response) override
         {
             std::string payload;
-            const std::vector<Booking::Theater> allTheaters = service.getTheaters();
+            const std::vector<Booking::Theater*> allTheaters = service.getTheaters();
             for (const auto& theater: allTheaters)
-                payload.append(theater.name).append("\n");
+                payload.append(theater->name).append("\n");
 
             response.send() << payload;
             response.send().flush();

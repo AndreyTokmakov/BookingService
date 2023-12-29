@@ -9,8 +9,16 @@ Description : CLI.cpp
 
 #include "CLI.h"
 #include <iostream>
-#include <iomanip>
 #include <charconv>
+
+namespace
+{
+    std::ostream& operator<<(std::ostream& stream, const std::vector<uint16_t>& values) {
+        for (uint16_t seatNum: values)
+            stream << seatNum << " ";
+        return stream;
+    }
+}
 
 namespace CLI
 {
@@ -72,9 +80,9 @@ namespace CLI
             outStream << "Please select a Theater to see the available slots\n";
         }
         else {
-            const std::vector<uint16_t> seats = service.getSeatsAvailable(theaterSelected.value() ,movieSelected.value() );
-            outStream << "Theater: " << theaterSelected.value() << ", Movie : " << movieSelected.value()<< std::endl;
-            outStream << "Seats available: " << seats << std::endl;
+            const std::vector<uint16_t> seats = service.getSeatsAvailable(theaterSelected.value() ,movieSelected.value());
+            outStream << "Theater: " << theaterSelected.value() << ", Movie : " << movieSelected.value()->name
+                      << "\nSeats available: " << seats << std::endl;
         }
         return true;
     }
@@ -85,25 +93,20 @@ namespace CLI
             outStream << "Movie name expected\n";
             return false;
         }
-        const Movie movie {name.data()};
-        const std::vector<Theater> allTheaters = service.getTheatersByMovie(movie);
 
-        outStream << "The movie '" << movie << "' is being shown in:\n";
+        const std::vector<Theater*> allTheaters = service.getTheatersByMovie(name.data());
+        outStream << "The movie '" << name << "' is being shown in:\n";
         for (const auto& theater: allTheaters)
-            outStream << '\t' << theater.name << std::endl;
+            outStream << '\t' << theater->name << std::endl;
 
         return true;
     }
 
-    bool SimpleCLI::isPremiereExist(const Booking::Theater& theater,
-                                    const Booking::Movie& movie) const noexcept
+    bool SimpleCLI::listPlayingMovies(std::string_view)
     {
-        if (!service.getPremiere(theater,movie).has_value()) {
-            outStream << "Unfortunately, the " << movie << " movie is not being shown at the " << theater << " cinema\n";
-            return false;
-        }
         return true;
     }
+
 
     bool SimpleCLI::selectTheater(std::string_view name)
     {
@@ -111,18 +114,18 @@ namespace CLI
         if (name.empty()) {
             outStream << "Theater name expected\n";
             return false;
-        } else if (movieSelected && !isPremiereExist( {name.data() },movieSelected.value())) {
-            return true;
         }
 
-        const std::vector<Theater> allTheaters = service.getTheaters();
-        if (const auto iter = std::find_if(allTheaters.cbegin(), allTheaters.cend(), [&](const Theater& theater) {
-                return theater.name == name;
-            }); allTheaters.end() != iter) {
-            theaterSelected = *iter;
-            outStream << "The " << theaterSelected.value() << " theater is chosen\n";
-        } else {
+        if (const std::optional<Theater*> theater = service.findTheater(name.data()); !theater) {
             outStream << "Failed to find the '" << name << "' theater\n";
+        }
+        else if (movieSelected && theater && !service.getPremiere(theater.value(), movieSelected.value()))
+        {
+            outStream << "Unfortunately, the " << movieSelected.value()->name << " movie is not being shown at the "
+                      << theater.value()->name << " cinema\n";
+        } else {
+            theaterSelected = theater.value();
+            outStream << "The " << theaterSelected.value()->name << " theater is chosen\n";
         }
         return true;
     }
@@ -133,36 +136,37 @@ namespace CLI
         if (name.empty()) {
             outStream << "Movie name expected\n";
             return false;
-        } else if (theaterSelected && !isPremiereExist(theaterSelected.value(),  {name.data() })) {
-            return true;
         }
 
-        const std::vector<Booking::Movie> movies = service.getAllPlayingMovies();
-        if (const auto iter = std::find_if(movies.cbegin(), movies.cend(), [&](const Booking::Movie& mov) {
-                return mov.name == name;
-            }); movies.end() != iter) {
-            movieSelected = *iter;
-            outStream << "The " << movieSelected.value() << " movie is chosen\n";
-        } else {
+        // TODO: Fixme std::string_view
+        if (const std::optional<Movie*> optMovie = service.findMovie(name.data()); !optMovie) {
             outStream << "Failed to find the '" << name << "' movie\n";
         }
+        else if (theaterSelected && optMovie && !service.getPremiere(theaterSelected.value(), optMovie.value()))
+        {
+            outStream << "Unfortunately, the " << optMovie.value()->name << " movie is not being shown at the "
+                      << theaterSelected.value()->name << " cinema\n";
+        } else {
+            movieSelected = optMovie.value();
+            outStream << "The " << movieSelected.value()->name << " movie is chosen\n";
+        }
         return true;
     }
 
-    bool SimpleCLI::printTheaters(std::string_view)
+    bool SimpleCLI::listAllTheaters(std::string_view)
     {
-        const std::vector<Booking::Theater> allTheaters = service.getTheaters();
+        const std::vector<Booking::Theater*> allTheaters = service.getTheaters();
         for (const auto& theater: allTheaters)
-            outStream << '\t' << theater.name << std::endl;
+            outStream << '\t' << theater->name << std::endl;
 
         return true;
     }
 
-    bool SimpleCLI::printMovies(std::string_view)
+    bool SimpleCLI::listAllMovies(std::string_view)
     {
-        const std::vector<Booking::Movie> allMovies = service.getAllPlayingMovies();
+        const std::vector<Booking::Movie*> allMovies = service.getMovies();
         for (const auto& movie: allMovies)
-            outStream << '\t' << movie.name << std::endl;
+            outStream << '\t' << movie->name << std::endl;
 
         return true;
     }

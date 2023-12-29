@@ -13,76 +13,88 @@ Description : BookingService.h
 #include <string>
 #include <vector>
 #include <array>
-#include <memory>
-#include <optional>
+
+#include "Database.h"
 
 namespace Booking
 {
+    using namespace DB;
+
     enum class SeatStatus: bool {
         Available,
         Booked
     };
 
-    // TODO: Static unique ID
-    struct Movie
+    struct Movie: TableEntry<Movie>
     {
-        std::string name;
-
-        std::strong_ordering operator<=>(const Movie&) const = default;
+        explicit Movie(std::string name): TableEntry {std::move(name)} {
+        }
     };
 
-    // TODO: Static unique ID
-    struct Theater
+    struct Theater: TableEntry<Theater>
     {
         static constexpr uint16_t seatsCapacityMax { 20 };
-        std::string name;
 
-        std::strong_ordering operator<=>(const Theater&) const = default;
+        explicit Theater(std::string name): TableEntry {std::move(name)} {
+        }
     };
 
     struct Premiere
     {
-        // TODO: to ID's
-        std::shared_ptr<Theater> theater;
-        std::shared_ptr<Movie> movie;
+        size_t theaterId {0};
+        size_t movieId {0};
         std::array<SeatStatus, Theater::seatsCapacityMax> seats {};
 
         mutable std::mutex mtxBooking;
 
-        Premiere(std::shared_ptr<Theater> theater, std::shared_ptr<Movie> movie);
+        Premiere(const Theater& theater, const Movie& movie);
 
-        [[nodiscard]]
+        [[nodiscard("Please check the result: Expensive to call")]]
         std::vector<uint16_t> getSeatsAvailable() const noexcept;
 
+        [[nodiscard("Please check the result: Expensive to call")]]
         bool bookSeats(const std::vector<uint16_t>& seatsToBook);
     };
 
     // TODO: DOCUMENTATION
     struct BookingService
     {
-        using MoviePtr = std::shared_ptr<Movie>;
-        using TheaterPtr = std::shared_ptr<Theater>;
         using PremierePtr = std::shared_ptr<Premiere>;
 
-        std::vector<MoviePtr> movies;
-        std::vector<TheaterPtr> theaters;
+        Table<Movie> movies;
+        Table<Theater> theaters;
         std::vector<PremierePtr> bookingSchedule;
 
         [[nodiscard]]
-        std::vector<Movie> getAllPlayingMovies() const;
+        std::optional<Movie*> findMovie(const std::string& name) const;
 
         [[nodiscard]]
-        std::vector<Theater> getTheaters() const;
+        std::optional<Theater*> findTheater(const std::string& name) const;
 
         [[nodiscard]]
-        std::vector<Theater> getTheatersByMovie(const Movie& movie) const;
+        std::vector<Movie*> getMovies() const;
 
         [[nodiscard]]
-        std::optional<PremierePtr> getPremiere(const Theater& theater,
-                                               const Movie& movie) const;
+        std::vector<Theater*> getTheaters() const;
+
         [[nodiscard]]
-        std::vector<uint16_t> getSeatsAvailable(const Theater& theater,
-                                                const Movie& movie) const;
+        std::vector<Movie*> getPlayingMovies() const;
+
+        [[nodiscard]]
+        std::vector<Theater*> getTheatersByMovie(const std::string& movieName) const;
+
+        [[nodiscard]]
+        std::optional<PremierePtr> getPremiere(const Theater* const theater,
+                                               const Movie* const movie) const;
+        [[nodiscard]]
+        std::optional<PremierePtr> getPremiere(const std::string& theaterName,
+                                               const std::string & movieName) const;
+        [[nodiscard]]
+        std::vector<uint16_t> getSeatsAvailable(const Theater* const theater,
+                                                const Movie* const movie) const;
+        [[nodiscard]]
+        std::vector<uint16_t> getSeatsAvailable(const std::string& theaterName,
+                                                const std::string& movieName) const;
 
         // Test method
         void addMovie(const std::string& movieName);
@@ -92,12 +104,6 @@ namespace Booking
         // Create some default data
         void initialize();
     };
-
-
-    std::ostream& operator<<(std::ostream& stream, const Movie& movie);
-    std::ostream& operator<<(std::ostream& stream, const Theater& theater);
-    std::ostream& operator<<(std::ostream& stream, const Premiere& premiere);
-    std::ostream& operator<<(std::ostream& stream, const std::vector<uint16_t>& values);
 };
 
 #endif //BOOKINGSERVICE_BOOKINGSERVICE_H
