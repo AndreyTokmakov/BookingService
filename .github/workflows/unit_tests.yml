@@ -36,6 +36,7 @@ jobs:
         run: |
             sudo apt-get update -qq
             sudo apt-get install build-essential cmake
+            sudo apt install libboost-all-dev
 
       - name: Build and compile
         run: |
