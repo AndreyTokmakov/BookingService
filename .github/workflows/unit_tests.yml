@@ -1,0 +1,33 @@
+
+name: PyTests
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  # This workflow contains a single job called "unit_tests"
+  unit_tests:
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+            # To run for each different python versions: so there will be 4 different run's
+            # python-version: [ "3.7", "3.8", "3.9", "3.10" ]
+
+            python-version: [ "3.7" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!

@@ -52,7 +52,8 @@ namespace {
         service.scheduleMovie("Inception", "Electric Cinema");
     }
 
-    std::vector<std::string> splitAndTrimOutput(const std::string &output) {
+    std::vector<std::string> splitAndTrimOutput(const std::string &output)
+    {
         std::vector<std::string> result;
         boost::split(result, output, boost::is_any_of("\n"));
         for (auto &s: result)
@@ -218,7 +219,14 @@ BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
         });
     }
 
-    // list playing movies
+    BOOST_FIXTURE_TEST_CASE(ListPlayingMovies, CLIFixture)
+    {
+        const auto [output, status] = sendCommand("list_playing_movies");
+        BOOST_CHECK(status == SimpleCLI::Status::Continue);
+        validateMultilineOutput(output,{
+                "Inception", "Terminator", "Fight Club"
+        });
+    }
 
     BOOST_FIXTURE_TEST_CASE(SelectTheater_Exising, CLIFixture)
     {

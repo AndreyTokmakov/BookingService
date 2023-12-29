@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(BookingService)
 
-set(CMAKE_PREFIX_PATH ../third_party/poco/cmake-build)
+set(CMAKE_PREFIX_PATH ../../third_party/poco/cmake-build)
 
 add_compile_options(-c -Wall -Wextra -O3 -std=c++2a)
 
