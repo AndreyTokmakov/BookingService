@@ -15,6 +15,7 @@
 #include <functional>
 #include <unordered_map>
 
+//! Command Line Interface for the BookingService
 namespace CLI
 {
     using namespace std::string_view_literals;

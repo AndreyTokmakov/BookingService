@@ -16,37 +16,54 @@
 
 #include "Database.h"
 
+//! Contains base parts and features of the Booking Service implementation
 namespace Booking
 {
     using namespace DB;
 
+    /** SeatStatus.
+     *  To enable type-safe seat booking handling (instead of bool)
+     */
     enum class SeatStatus: bool {
         Available,
         Booked
     };
 
+    /**
+     * @brief Represents a Movie DataBase entry/record
+     */
     struct Movie: TableEntry<Movie>
     {
-        explicit Movie(std::string name): TableEntry {std::move(name)} {
+        explicit Movie(std::string name): TableEntry (std::move(name)) {
         }
     };
 
+    /**
+     * @brief Represents a Theater DataBase entry/record
+     */
     struct Theater: TableEntry<Theater>
     {
+        /** Maximum number of seats the each Theater have **/
         static constexpr uint16_t seatsCapacityMax { 20 };
 
         explicit Theater(std::string name): TableEntry {std::move(name)} {
         }
     };
 
-    // TODO: Add more info
     /**
-     * @brief Premiere class
+     * @brief Premiere class: To combine the relationship of Theater, Movie and the status of seats for the audience
      */
     struct Premiere
     {
+        /** The unique identifier (from the database) of the Theater where the Movie with
+         *  the appropriate movieId will be shown */
         size_t theaterId {0};
+
+        /** The unique identifier (from the database) of the Movie that will
+         *  be shown in the Theater with the appropriate theaterId */
         size_t movieId {0};
+
+        /** Maximum number of seats the each Theater have **/
         std::array<SeatStatus, Theater::seatsCapacityMax> seats {};
 
         mutable std::mutex mtxBooking;
@@ -76,6 +93,12 @@ namespace Booking
         bool bookSeats(const std::vector<uint16_t>& seatsToBook);
     };
 
+    /**
+     * @brief BookingService class
+     * Has access to a Database of Theater's and Movie's<br>
+     * Database - its just a simple DB-like In Memory indexed tables, to enable fast O(n) access to
+     * corresponding TableEntries by Name (std::string) or ID (size_t)
+     */
     struct BookingService
     {
         using PremierePtr = std::shared_ptr<Premiere>;

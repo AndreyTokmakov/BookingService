@@ -20,11 +20,23 @@
 //! Contains the definition and implementation of the basic building blocks of database behavior emulation
 namespace DB
 {
+    struct NonCopyable
+    {
+        NonCopyable() = default;
+
+        NonCopyable(const NonCopyable&) = delete;
+        NonCopyable& operator=(const NonCopyable&) = delete;
+
+        NonCopyable(const NonCopyable&&) noexcept = delete;
+        NonCopyable& operator=(const NonCopyable&&) noexcept = delete;
+    };
+
     /**
      * @brief It is a basic template class for entities stored in databases
+     * @tparam T the TableEntry specialization
      */
     template<typename T>
-    struct TableEntry
+    struct TableEntry: NonCopyable
     {
         std::string name;
         size_t id { 0 };
@@ -42,12 +54,15 @@ namespace DB
         static inline size_t uniqueEntryId {0};
     };
 
+
     template <typename Ty>
     concept TableEntryType = std::derived_from<Ty, TableEntry<Ty>>;
+
 
     /**
      * @brief The DataBase Table emulation class<br>
      * Under the hood, it is implemented in the form of two Hash Tables for searching by ID and name of the corresponding entity
+     * @tparam T type of the Entry stored in Table
      */
     template<TableEntryType T>
     class Table
@@ -63,6 +78,11 @@ namespace DB
 
     public:
 
+        /**
+          * Add corresponding DataBase EntryType record to the table <br>
+          * the record is added to two tables at once, for searching by keys: std::string and size_t
+          * @param name the entry name
+         */
         void addEntry(const std::string &name)
         {
             SharedEntry objPtr = std::make_shared<EntryType>(name);
@@ -70,24 +90,42 @@ namespace DB
             tableByName.emplace(objPtr->name, std::move(objPtr));
         }
 
-        // TODO: Clients of the function should not be involved in managing the lifecycle of the stored object:
-        //       therefore returning *T instead of std::shared_ptr<T>
+        /**
+          * Searches for an entry in the table by its name
+          *
+          * @param name the entry name
+          * @return std::optional<T*> (std::nullopt in case if no entry was found in table)
+          * @note Clients (callers) of the function shall not participate in lifecycle managing of <br>
+          * the stored object - therefore returning <b>*T</b> instead of <b>std::shared_ptr<T></b>
+         */
         std::optional<EntryPointer> findEntryName(const std::string &name) const noexcept {
             if (const auto it = tableByName.find(name); tableByName.end() != it)
                 return std::make_optional<EntryPointer>(it->second.get());
             return std::nullopt;
         }
 
-        // TODO: Clients of the function should not be involved in managing the lifecycle of the stored object:
-        //       therefore returning *T instead of std::shared_ptr<T>
+        /**
+          * Searches for an entry in the table by its ID
+          *
+          * @param id the entry ID
+          * @return std::optional<T*> (std::nullopt in case if no entry was found in table)
+          * @note Clients (callers) of the function shall not participate in lifecycle managing of <br>
+          * the stored object - therefore returning <b>*T</b> instead of <b>std::shared_ptr<T></b>
+         */
         std::optional<EntryPointer> findEntryByID(size_t id) const noexcept {
             if (const auto it = entryTable.find(id); entryTable.end() != it)
                 return std::make_optional<EntryPointer>(it->second.get());
             return std::nullopt;
         }
 
-        // TODO: Clients of the function should not be involved in managing the lifecycle of the stored object:
-        //       therefore returning *T instead of std::shared_ptr<T>
+        /**
+          * Return the list of records in table
+          *
+          * @param id the entry ID
+          * @return the list (vector) of all data in table [std::vector<T*>]
+          * @note Clients (callers) of the function shall not participate in lifecycle managing of <br>
+          * the stored object - therefore returning <b>*T</b> instead of <b>std::shared_ptr<T></b>
+         */
         [[nodiscard]]
         std::vector<EntryPointer> getAllEntries() const {
             std::vector<EntryPointer> allRecords;
