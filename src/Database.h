@@ -20,6 +20,7 @@
 //! Contains the definition and implementation of the basic building blocks of database behavior emulation
 namespace DB
 {
+
     struct NonCopyable
     {
         NonCopyable() = default;
