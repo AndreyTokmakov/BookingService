@@ -36,8 +36,6 @@ jobs:
       - name: Build and compile
         #env:
         #  COMPILER: ${{ matrix.compiler-version[0] }}
-        with:
-          compiler: ${{ matrix.compiler }}
         run: |
           export CC=gcc-13 CXX=g++-13
           mkdir build && cd build
