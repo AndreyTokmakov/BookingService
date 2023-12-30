@@ -17,8 +17,12 @@
 #include <optional>
 #include <concepts>
 
+//! Contains the definition and implementation of the basic building blocks of database behavior emulation
 namespace DB
 {
+    /**
+     * @brief It is a basic template class for entities stored in databases
+     */
     template<typename T>
     struct TableEntry
     {
@@ -41,6 +45,10 @@ namespace DB
     template <typename Ty>
     concept TableEntryType = std::derived_from<Ty, TableEntry<Ty>>;
 
+    /**
+     * @brief The DataBase Table emulation class<br>
+     * Under the hood, it is implemented in the form of two Hash Tables for searching by ID and name of the corresponding entity
+     */
     template<TableEntryType T>
     class Table
     {
