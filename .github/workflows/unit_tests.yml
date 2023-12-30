@@ -16,25 +16,20 @@ jobs:
   unit_tests:
 
     # The type of runner that the job will run on
+    name: "${{matrix.title}} (${{matrix.cc}}, ${{matrix.arch}}, ${{matrix.build_type}})"
     runs-on: ubuntu-latest
     strategy:
         matrix:
-            # python-version: [ "3.7" ]
           compiler-version: [[g++-13, gcc-13]]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
       - name: Install Packages
         run: |
             sudo apt-get update -qq
-            sudo apt-get install build-essential cmake make
-            sudo apt install libboost-all-dev
+            sudo apt-get install build-essential cmake make libboost-all-dev
 
       - name: Build and compile
         env:
