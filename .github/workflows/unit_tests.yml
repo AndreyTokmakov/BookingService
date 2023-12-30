@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,6 @@ jobs:
   unit_tests:
 
     # The type of runner that the job will run on
-    name: "${{matrix.title}} (${{matrix.cc}}, ${{matrix.arch}}, ${{matrix.build_type}})"
     runs-on: ubuntu-latest
     strategy:
         matrix:
@@ -41,8 +40,5 @@ jobs:
           make
 
       - name: Run Unit-Tests
-        env:
-          COMPILER: ${{ matrix.compiler-version[0] }}
         run: |
-          cd build
-          ./test/tests -l all
+          ./build/test/tests -l all

@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_SUITE(CLI_Basic_Tests)
     BOOST_FIXTURE_TEST_CASE(Booking_WrongInput_NoSeats, BookingCLIFixture)
     {
         auto [output, status] = sendCommand("book_seats");
-        CHECK_CONTAINS(output, "Seats numbers expected99");
+        CHECK_CONTAINS(output, "Seats numbers expected");
     }
 
     BOOST_FIXTURE_TEST_CASE(Booking_WrongInput_Boundaries_Test, BookingCLIFixture)
