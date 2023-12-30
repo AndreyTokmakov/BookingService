@@ -54,3 +54,10 @@ jobs:
           mkdir build && cd build
           cmake ..
           make
+
+      - name: Run Unit-Tests
+        env:
+          COMPILER: ${{ matrix.compiler-version[0] }}
+        run: |
+          cd build
+          ./test/tests -l all
