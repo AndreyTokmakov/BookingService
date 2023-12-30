@@ -37,6 +37,8 @@ jobs:
             sudo apt install libboost-all-dev
 
       - name: Print environment info
+        env:
+          COMPILER: ${{ matrix.compiler-version[0] }}
         run: |
           cmake --version
           gcc -v
@@ -45,6 +47,8 @@ jobs:
           ls -l
 
       - name: Build and compile
+        env:
+          COMPILER: ${{ matrix.compiler-version[0] }}
         run: |
           mkdir build && cd build
           cmake ..
