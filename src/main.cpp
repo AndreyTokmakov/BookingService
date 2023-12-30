@@ -13,7 +13,6 @@
 
 #include "BookingService.h"
 #include "CLI.h"
-#include "WebService.h"
 
 /**
  * @mainpage Booking Service Demo Documentation
@@ -37,7 +36,6 @@ int main([[maybe_unused]] int argc,
          [[maybe_unused]] char** argv)
 {
     using namespace Booking;
-    // WebService::start(argc, argv);
 
     Booking::BookingService service;
     service.initialize();

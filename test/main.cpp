@@ -28,7 +28,6 @@ Description :
 
 #include "BookingService.h"
 #include "CLI.h"
-#include "WebService.h"
 
 #define CHECK_CONTAINS(str, txt)   BOOST_CHECK_NE(str.find(txt), std::string::npos);
 

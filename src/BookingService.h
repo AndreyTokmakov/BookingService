@@ -152,7 +152,7 @@ namespace Booking
          * @return an object of type std::optional containing a pointer to the Premiere,
          *          if it could not be found, then std::null
          *
-         * @note The method is less productive than
+         * @note The method is less performant than
          * BookingService::getPremiere(const Theater* const, const Movie* const) const \n
          * since it additionally searches for the appropriate Movie and Theater in the database by
          * their names and only after \n that, in case of successful search, start trying to find corresponding Premiere
@@ -163,25 +163,57 @@ namespace Booking
                                                const std::string & movieName) const;
 
         /**
-         * Returns the premiere (an object of the Premiere class) of the specified movie in the specified cinema, if any
-         * @param theater Theater class instance pointer (the Theater where the film is being shown)
-         * @param movie Movie class instance pointer (Movie which is expected to be shown at the specified Theater)
-         * @return an object of type std::optional containing a pointer to the Premiere,
-         *          if it could not be found, then std::null
+         * Returns a list of theater seats available for booking
+         * @param theater Theater class instance pointer
+         * @param movie Movie class instance pointer
+         * @return Object of the std::vector class with the numbers of seats. In case if all seats already booked a empty
+         * collection shall be return
+         * @throw nothrow
         */
         [[nodiscard]]
         std::vector<uint16_t> getSeatsAvailable(const Theater* const theater,
                                                 const Movie* const movie) const;
+
+        /**
+         * Returns a list of theater seats available for booking
+         * @param theaterName the Theater name
+         * @param movieName the Movie name
+         * @return Object of the std::vector class with the numbers of seats. In case if all seats already booked a empty
+         * collection shall be return
+         *
+         * @note The method is less performant than
+         * BookingService::getSeatsAvailable(const Theater* const, const Movie* const) const
+        */
         [[nodiscard]]
         std::vector<uint16_t> getSeatsAvailable(const std::string& theaterName,
                                                 const std::string& movieName) const;
 
-        // Test method
+        /**
+         * Adds a Movie to the Database by its name
+         * @param movieName the Movie name
+         * @note A test function.
+        */
         void addMovie(const std::string& movieName);
+
+        /**
+         * Adds a Theater to the Database by its name
+         * @param theaterName the Theater name
+         * @note A test function.
+        */
         void addTheater(const std::string& theaterName);
+
+        /**
+         * Schedule a premiere (Premiere) for the specific Movie ad the specific Theater
+         * @param movieName the Movie name
+         * @param theaterName the Theater name
+         * @note A test function.
+        */
         bool scheduleMovie(const std::string& movieName, const std::string& theaterName);
 
-        // Create some default data
+        /**
+         * It is used for the purpose of initializing the test dataset
+         * @note A test function.
+        */
         void initialize();
     };
 };
