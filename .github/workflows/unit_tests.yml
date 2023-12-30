@@ -41,8 +41,8 @@ jobs:
           COMPILER: ${{ matrix.compiler-version[0] }}
         run: |
           cmake --version
-          gcc -v
-          g++ -v
+          gcc-13 -v
+          g++-13 -v
           pwd
           ls -l
 
@@ -50,6 +50,7 @@ jobs:
         env:
           COMPILER: ${{ matrix.compiler-version[0] }}
         run: |
+          export CC=gcc-13 CXX=g++-13
           mkdir build && cd build
           cmake ..
           make
