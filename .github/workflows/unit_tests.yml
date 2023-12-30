@@ -19,7 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-          compiler-version: [[g++-13, gcc-13]]
+          # compiler-version: [[g++-13, gcc-13]]
+          compiler:
+            - gcc-13
+            - g++-13
 
     steps:
       - name: Checkout code
@@ -31,8 +34,10 @@ jobs:
             sudo apt-get install build-essential cmake make libboost-all-dev
 
       - name: Build and compile
-        env:
-          COMPILER: ${{ matrix.compiler-version[0] }}
+        #env:
+        #  COMPILER: ${{ matrix.compiler-version[0] }}
+        with:
+          compiler: ${{ matrix.compiler }}
         run: |
           export CC=gcc-13 CXX=g++-13
           mkdir build && cd build
