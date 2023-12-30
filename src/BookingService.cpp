@@ -1,11 +1,11 @@
-/**============================================================================
-Name        : BookingService.cpp
-Created on  : 28.12.2023
-Author      : Andrei Tokmakov
-Version     : 1.0
-Copyright   : Your copyright notice
-Description : BookingService.cpp
-============================================================================**/
+/**
+ * @file       BookingService.cpp
+ * @date       29.12.2023
+ * @author     Andrei Tokmakov
+ * @version    1.0
+ * @copyright  Your copyright notice
+ * @brief      BookingService modules definition
+*/
 
 #include "BookingService.h"
 #include <algorithm>

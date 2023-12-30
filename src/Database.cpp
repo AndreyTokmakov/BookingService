@@ -1,11 +1,11 @@
-/**============================================================================
-Name        : Database.cpp
-Created on  : 29.12.2023
-Author      : Andrei Tokmakov
-Version     : 1.0
-Copyright   : Your copyright notice
-Description : Database modules implementation
-============================================================================**/
+/**
+ * @file       Database.cpp
+ * @date       29.12.2023
+ * @author     Andrei Tokmakov
+ * @version    1.0
+ * @copyright  Your copyright notice
+ * @brief      Database modules implementation
+ */
 
 #include "Database.h"
 

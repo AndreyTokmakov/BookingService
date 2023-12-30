@@ -1,11 +1,11 @@
-/**============================================================================
-Name        : CLI.h
-Created on  : 28.12.2023
-Author      : Andrei Tokmakov
-Version     : 1.0
-Copyright   : Your copyright notice
-Description : CLI.h
-============================================================================**/
+/**
+ * @file       CLI.h
+ * @date       29.12.2023
+ * @author     Andrei Tokmakov
+ * @version    1.0
+ * @copyright  Your copyright notice
+ * @brief      CLI modules declaration
+*/
 
 #ifndef BOOKINGSERVICE_CLI_H
 #define BOOKINGSERVICE_CLI_H

@@ -1,11 +1,11 @@
-/**============================================================================
-Name        : CLI.cpp
-Created on  : 28.12.2023
-Author      : Andrei Tokmakov
-Version     : 1.0
-Copyright   : Your copyright notice
-Description : CLI.cpp
-============================================================================**/
+/**
+ * @file       CLI.cpp
+ * @date       29.12.2023
+ * @author     Andrei Tokmakov
+ * @version    1.0
+ * @copyright  Your copyright notice
+ * @brief      CLI modules definition
+*/
 
 #include "CLI.h"
 #include <iostream>
