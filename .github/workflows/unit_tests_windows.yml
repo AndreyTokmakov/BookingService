@@ -35,6 +35,6 @@ jobs:
 
       - name: Build and compile
         run: |
-          mkdir build && cd build
-          pwd
-          dir
+          mkdir build
+          cd build
+          cmake ..
