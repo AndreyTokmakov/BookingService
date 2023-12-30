@@ -1,0 +1,46 @@
+
+name: UnitTests
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  # This workflow contains a single job called "unit_tests"
+  unit_tests:
+
+    name: BookingService Unit Tests
+
+    # The type of runner that the job will run on
+    runs-on:  windows-latest
+
+    strategy:
+        matrix:
+          compiler:
+            - gcc-13 g++-13
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Packages
+        run: |
+            sudo apt-get update -qq
+            sudo apt-get install build-essential cmake make libboost-all-dev
+
+      - name: Build and compile
+        run: |
+          export CC=gcc-13 CXX=g++-13
+          mkdir build && cd build
+          cmake ..
+          make
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
