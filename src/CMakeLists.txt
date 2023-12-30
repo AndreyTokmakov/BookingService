@@ -1,14 +1,12 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.16.3)
 project(BookingService)
-
-# set(CMAKE_PREFIX_PATH ../../third_party/poco/cmake-build)
 
 add_compile_options(-c -Wall -Wextra -O3 -std=c++2a)
 
+# set(CMAKE_PREFIX_PATH ../../third_party/poco/cmake-build)
 # find_package(Poco REQUIRED Foundation Net Util)
 
-set(CMAKE_CXX_STANDARD 23)
-
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(BookingService
         main.cpp

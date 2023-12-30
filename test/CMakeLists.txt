@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(tests)
 add_compile_options(-c -Wall -Werror -Wextra -O3 -std=c++2a)

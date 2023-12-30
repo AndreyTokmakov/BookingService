@@ -15,13 +15,13 @@ Description : Database modules implementation
 #include <vector>
 #include <unordered_map>
 #include <optional>
+#include <concepts>
 
 namespace DB
 {
     template<typename T>
     struct TableEntry
     {
-        static inline size_t uniqueEntryId {0};
         std::string name;
         size_t id { 0 };
 
@@ -32,6 +32,10 @@ namespace DB
 
         template<typename Type>
         friend bool operator==(const TableEntry<Type> &, const TableEntry<Type> &);
+
+    private:
+
+        static inline size_t uniqueEntryId {0};
     };
 
     template <typename Ty>

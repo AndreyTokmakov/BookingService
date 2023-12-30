@@ -38,11 +38,16 @@ jobs:
             sudo apt-get install build-essential cmake make
             sudo apt install libboost-all-dev
 
-      - name: Build and compile
+      - name: Print environment info
         run: |
-          ls -l
-          mkdir build && cd build
+          cmake --version
+          gcc -v
+          g++ -v
           pwd
           ls -l
+          mkdir build && cd build
+
+      - name: Build and compile
+        run: |
           cmake ..
           make
