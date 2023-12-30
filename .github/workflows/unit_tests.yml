@@ -1,5 +1,5 @@
 
-name: PyTests
+name: UnitTests
 
 on:
   push:
@@ -19,10 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-            # To run for each different python versions: so there will be 4 different run's
-            # python-version: [ "3.7", "3.8", "3.9", "3.10" ]
-
-            python-version: [ "3.7" ]
+            # python-version: [ "3.7" ]
+          compiler-version: [[g++-13, gcc-13]]
 
     steps:
       - name: Checkout code
@@ -45,9 +43,9 @@ jobs:
           g++ -v
           pwd
           ls -l
-          mkdir build && cd build
 
       - name: Build and compile
         run: |
+          mkdir build && cd build
           cmake ..
           make
