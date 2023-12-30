@@ -4,7 +4,7 @@ project(tests)
 add_compile_options(-c -Wall -Werror -Wextra -O3 -std=c++2a)
 
 if (WIN32)
-    message(STATUS "Building under Widndow OS")
+    message(STATUS "Building under Windows OS")
     # Set up correct path to Boost Library folder
     set(BOOST_ROOT "C:/boost_1_78_0/")
     set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
