@@ -36,16 +36,6 @@ jobs:
             sudo apt-get install build-essential cmake make
             sudo apt install libboost-all-dev
 
-      - name: Print environment info
-        env:
-          COMPILER: ${{ matrix.compiler-version[0] }}
-        run: |
-          cmake --version
-          gcc-13 -v
-          g++-13 -v
-          pwd
-          ls -l
-
       - name: Build and compile
         env:
           COMPILER: ${{ matrix.compiler-version[0] }}
