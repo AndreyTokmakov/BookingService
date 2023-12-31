@@ -11,6 +11,7 @@ Demo BookingService
 6. [How to run tests](#Tests)
 7. [How to use CLI](#CLI)
 8. [Continuous Integration](#CI)
+9. [Documentation](#Documentation)
 
 <a name="Overview"></a>
 ## Overview
@@ -133,4 +134,16 @@ branches or on submitting Pull Request to the **main** branch
 3. At each launch, the build status of the project is checked and Unit tests are run
    </br></br>![workflows](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_1.png)
    </br></br>![Unit-tests status](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_2.png)
-   </br></br></br>![Pipeline](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_3.png)
+   </br></br>![Pipeline](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_3.png)
+
+
+<a name="Documentation"></a>
+## Documentation
+The project supports auto-documentation based on the Doxygen framework.
+1. Install Doxygen (check version to make sure of installation) `doxygen --version`
+2. Move to the project root folder and generate documentation `doxygen Doxyfile.in`
+3. Open _./docs/html/index.html_ in Browser
+Documentation views examples:
+   </br></br>![namespaces](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Doc_1.png)
+   </br></br>![classes](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Doc_2.png)
+   </br></br>![graphs](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Doc_3.png)
