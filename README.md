@@ -1,13 +1,15 @@
 # BookingService
 Demo BookingService 
 
-0. [Overview](#Overview)
-1. [Download](#Download)
-2. [Build](#Build)
-3. [Requirements](#Requirements)
-4. [Run service](#Run service)
-5. [Tests](#Tests)
-6. [How to use CLI](#CLI)
+1. [Overview](#Overview)
+2. [Download](#Download)
+3. [Build](#Build)
+   1. [Linux](#linux_build)
+   2. [Windows](#windows_build)
+4. [Requirements](#Requirements)
+5. [Run CLI](#Run_CLI)
+6. [How to run tests](#Tests)
+7. [How to use CLI](#CLI)
 
 <a name="Overview"></a>
 ## Overview
@@ -34,6 +36,7 @@ Available CLI commands:
 - select_movie: Select Movie by its name
 - list_available_seats: List all available seats for the selected movie at the selected cinema
 - book_seats: Book available seats for the premiere
+- q: Exit/Close CLI
 
 
 <a name="Download"></a>
@@ -49,14 +52,21 @@ Available CLI commands:
 
 <a name="Build"></a>
 ## Build
+<a name="linux_build"></a>
+### Linux 
 - Create build folder: `mkdir build`
 - Move to the created directory: `cd build`
 - Configure project build (with cmake): `cmake -DCMAKE_BUILD_TYPE=Release ..`
 - Build and compile solution: `make`,
   alternatively, the number of CPUs can be specified to speed up the build `make -j8`
 
-<a name="Run service"></a>
-## Run service
+<a name="windows_build"></a>
+### Windows
+- Same steps as when building for Linux 
+- You only need the **BOOST_ROOT** variable to configure the project for **Cmake**
+
+<a name="Run_CLI"></a>
+## Run CLI
 - Move to the build folder: `cd build`
 - Start CLI application: `./src/BookingService`
 
