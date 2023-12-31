@@ -159,7 +159,9 @@ only for the purpose of demonstration~~) if its not desired to change the enviro
    2. build image: `docker build -t service_image . `</br></br>
 2. _How to understand if the image has been  build successfully_:
    </br>If such a message appears at the end of the build process, then everything is OK
-   ```*** No errors detected
+   ```
+   *** No errors detected
+   
    /service/test/main.cpp(194): Leaving test suite "CLI_Basic_Tests"; testing time: 699us
    Leaving test module "BookingServiceUnitTests"; testing time: 840us
    Removing intermediate container 89bf5903d653
