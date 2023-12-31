@@ -170,7 +170,8 @@ only for the purpose of demonstration~~) if its not desired to change the enviro
    Successfully tagged service_image:latest
    ```
   
-3. _Hot to run service inside the container_: `docker run --rm -it --name service_container service_image ./src/BookingService`
+3. _To run service inside the container execute the following command_: </br>
+  `docker run --rm -it --name service_container service_image ./src/BookingService`
 
 **P.S** Docker installs all required components during build and runs unit-test-s. </br>
 And only if all the steps are completed successfully, the image will be assembled. </br>
