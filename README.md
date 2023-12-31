@@ -76,15 +76,8 @@ Available CLI commands:
 ## How to run tests
 - Move to the build folder: `cd build`
 - Run the tests: `./test/tests -p`
-```
-Running 36 test cases...
-
-0%   10   20   30   40   50   60   70   80   90   100%
-|----|----|----|----|----|----|----|----|----|----|
-***************************************************
-
-*** No errors detected
-```
+   </br>![UnitTestsLocal](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Unit_Test_local.png)
+ 
 
 <a name="CLI"></a>
 ## How to use CLI
@@ -135,6 +128,6 @@ feedback on the status of the project and the presence/absence of kind of regres
 2. Builds and tests are configured to run on each code pushes to the **main**, **develop**
 branches or on submitting Pull Request to the **main** branch
 3. At each launch, the build status of the project is checked and Unit tests are run
-   </br></br>![workflows](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_1.png)</br>
-   ![Unit-tests status](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_2.png)</br>
-   ![Pipeline](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_3.png)
+   </br></br></br>![workflows](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_1.png)
+   </br></br></br>![Unit-tests status](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_2.png)
+   </br></br></br>![Pipeline](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_3.png)
