@@ -10,6 +10,7 @@ Demo BookingService
 5. [Run CLI](#Run_CLI)
 6. [How to run tests](#Tests)
 7. [How to use CLI](#CLI)
+8. [Continuous Integration](#CI)
 
 <a name="Overview"></a>
 ## Overview
@@ -28,10 +29,10 @@ Implementation Details:
 - The Command Line Interface (CLI) will be used as the UI
 
 Available CLI commands:
-- list_theaters: list all Threaters
+- list_theaters: list all Theaters
 - list_movies: list all Movies
 - list_playing_movies: List all Playing movies
-- find_theaters: List all Threaters playing specified Movie
+- find_theaters: List all Theaters playing specified Movie
 - select_theater: Select the Theater by its name
 - select_movie: Select Movie by its name
 - list_available_seats: List all available seats for the selected movie at the selected cinema
@@ -125,3 +126,15 @@ Sorry: Failed to book seats: 4
 
 > q
 ```
+
+<a name="CI"></a>
+## Continuous Integration
+**GitHub Actions** is used for Quality Assurance purposes and to receive a rapid 
+feedback on the status of the project and the presence/absence of kind of regression.
+1. BookingService recent [workflows](https://github.com/AndreyTokmakov/BookingService/actions) status <br />
+2. Builds and tests are configured to run on each code pushes to the **main**, **develop**
+branches or on submitting Pull Request to the **main** branch
+3. At each launch, the build status of the project is checked and Unit tests are run
+   </br></br>![workflows](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_1.png)</br>
+   ![Unit-tests status](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_2.png)</br>
+   ![Pipeline](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_3.png)
