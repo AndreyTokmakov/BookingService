@@ -28,11 +28,11 @@ include_directories(${SRC_DIR})
 # include all components
 add_executable(tests
         main.cpp
+        database_tests.cpp
         ${SRC_DIR}/BookingService.h
         ${SRC_DIR}/BookingService.cpp
         ${SRC_DIR}/CLI.cpp
         ${SRC_DIR}/CLI.h
-        ${SRC_DIR}/Database.cpp
         ${SRC_DIR}/Database.h
         )
 

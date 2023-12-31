@@ -34,7 +34,8 @@ Description :
 using namespace Booking;
 using namespace CLI;
 
-namespace {
+namespace
+{
     void insertTestData(Booking::BookingService &service) {
         service.addMovie("Fight Club");
         service.addMovie("Terminator");

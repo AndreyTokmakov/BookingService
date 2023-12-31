@@ -21,6 +21,10 @@
 namespace DB
 {
 
+    /**
+     * @brief Interface to express/ensure that a derived class cannot/should not be copied.
+     * @note Not using boost::noncopyable to not add library dependencies to the service core implementation
+     */
     struct NonCopyable
     {
         NonCopyable() = default;
@@ -30,6 +34,8 @@ namespace DB
 
         NonCopyable(const NonCopyable&&) noexcept = delete;
         NonCopyable& operator=(const NonCopyable&&) noexcept = delete;
+
+        virtual ~NonCopyable() = default;
     };
 
     /**
@@ -55,6 +61,10 @@ namespace DB
         static inline size_t uniqueEntryId {0};
     };
 
+    template<typename T>
+    bool operator==(const TableEntry<T> &left, const TableEntry<T> &right) {
+        return left.id == right.id;
+    }
 
     template <typename Ty>
     concept TableEntryType = std::derived_from<Ty, TableEntry<Ty>>;
@@ -82,13 +92,14 @@ namespace DB
         /**
           * Add corresponding DataBase EntryType record to the table <br>
           * the record is added to two tables at once, for searching by keys: std::string and size_t
-          * @param name the entry name
+          * @param name pointer to inserted entry
          */
-        void addEntry(const std::string &name)
+        EntryPointer addEntry(const std::string &name)
         {
             SharedEntry objPtr = std::make_shared<EntryType>(name);
             entryTable.emplace(objPtr->id, objPtr);
-            tableByName.emplace(objPtr->name, std::move(objPtr));
+            const auto& [iter, ok] = tableByName.emplace(objPtr->name, std::move(objPtr));
+            return iter->second.get();
         }
 
         /**

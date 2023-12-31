@@ -19,24 +19,11 @@
  *
  * @section intro_sec Introduction
  * C++ implementation of the most simplified service for booking seats in the cinema
- *
- * @section install_sec Installation
- *
- * @subsection install_dependencies Installing Dependencies
- * Do somethings ...
- *
- * @subsection install_library Installing Library
- * Do somethings ...
- *
- * @subsection install_example Installing Examples
- * Do somethings ...
  */
 
 int main([[maybe_unused]] int argc,
          [[maybe_unused]] char** argv)
 {
-    using namespace Booking;
-
     Booking::BookingService service;
     service.initialize();
 

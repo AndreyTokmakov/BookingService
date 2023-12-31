@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(BookingService
         main.cpp
-        Database.cpp Database.h
+        Database.h
         BookingService.cpp BookingService.h
         CLI.cpp CLI.h
 )
