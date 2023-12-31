@@ -12,6 +12,7 @@ Demo BookingService
 7. [How to use CLI](#CLI)
 8. [Continuous Integration](#CI)
 9. [Documentation](#Documentation)
+10. [Docker environment](#docker)
 
 <a name="Overview"></a>
 ## Overview
@@ -147,3 +148,28 @@ Documentation views examples:
    </br></br>![namespaces](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Doc_1.png)
    </br></br>![classes](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Doc_2.png)
    </br></br>![graphs](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Doc_3.png)
+
+<a name="docker"></a>
+## Docker environment
+The option to run the service (application) and unit-tests in the docker container is also supported </br>
+This option (~~In fact, Docker is completely unnecessary for the operation of the application and was created 
+only for the purpose of demonstration~~) if its not desired to change the environment on a working OS
+1. _How to build the docker image_: 
+   1. Move to the project root folder
+   2. build image: `docker build -t service_image . `</br></br>
+2. _How to understand if the image has been  build successfully_:
+   </br>If such a message appears at the end of the build process, then everything is OK
+   ```*** No errors detected
+   /service/test/main.cpp(194): Leaving test suite "CLI_Basic_Tests"; testing time: 699us
+   Leaving test module "BookingServiceUnitTests"; testing time: 840us
+   Removing intermediate container 89bf5903d653
+   ---> 91004d63dabc
+   Successfully built 91004d63dabc
+   Successfully tagged service_image:latest
+   ```
+  
+3. _Hot to run service inside the container_: `docker run --rm -it --name service_container service_image ./src/BookingService`
+
+**P.S** Docker installs all required components during build and runs unit-test-s. </br>
+And only if all the steps are completed successfully, the image will be assembled. </br>
+In case of an error when running tests, there will be a lot of red error messages in the console

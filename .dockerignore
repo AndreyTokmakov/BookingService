@@ -1,0 +1,7 @@
+.github
+.gitignore
+.idea
+Dockerfile
+./cmake-*
+./build
+./docs
