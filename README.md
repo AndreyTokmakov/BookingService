@@ -24,20 +24,23 @@ Service should be able to:
 - Select a movie
 - Book one or more of the available seats. Service should be able to handle multiple requests simultaneously (no over-bookings)
 
-Implementation Details:
+**Implementation Details**:
 - Instead of a real database, InMemory storage will be used (just a simplified simulation)
 - The Command Line Interface (CLI) will be used as the UI
 
-Available CLI commands:
-- list_theaters: list all Theaters
-- list_movies: list all Movies
-- list_playing_movies: List all Playing movies
-- find_theaters: List all Theaters playing specified Movie
-- select_theater: Select the Theater by its name
-- select_movie: Select Movie by its name
-- list_available_seats: List all available seats for the selected movie at the selected cinema
-- book_seats: Book available seats for the premiere
-- q: Exit/Close CLI
+**Available CLI commands**:
+
+| Command                | Description                                                            | Example                                 |
+|------------------------|------------------------------------------------------------------------|-----------------------------------------|
+| _list_theaters_        | Display the list all Theaters                                          | list_theaters                           |
+| _list_movies_          | Display the list all Movies                                            | list_movies                             |
+| _list_playing_movies_  | List all Playing movies                                                | list_playing_movies                     |
+| _find_theaters_        | List all Theaters playing specified Movie                              | find_theaters Terminator                |
+| _select_theater_       | Select the Theater by its name                                         | select_theater 4DX                      |
+| _select_movie_         | Select Movie by its name                                               | select_movie Terminator                 |
+| _list_available_seats_ | List all available seats for the selected movie at the selected cinema | list_available_seats                    |
+| _book_seats_           | Book available seats for the premiere                                  | book_seats 1,2,3,4,5 <br/> book_seats 1 |
+| _q_                    | Exit/Close CLI                                                         | q                                       |
 
 
 <a name="Download"></a>
@@ -76,7 +79,7 @@ Available CLI commands:
 ## How to run tests
 - Move to the build folder: `cd build`
 - Run the tests: `./test/tests -p`
-   </br>![UnitTestsLocal](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Unit_Test_local.png)
+   </br></br>![UnitTestsLocal](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Unit_Test_local.png)
  
 
 <a name="CLI"></a>
@@ -128,6 +131,6 @@ feedback on the status of the project and the presence/absence of kind of regres
 2. Builds and tests are configured to run on each code pushes to the **main**, **develop**
 branches or on submitting Pull Request to the **main** branch
 3. At each launch, the build status of the project is checked and Unit tests are run
-   </br></br></br>![workflows](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_1.png)
-   </br></br></br>![Unit-tests status](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_2.png)
+   </br></br>![workflows](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_1.png)
+   </br></br>![Unit-tests status](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_2.png)
    </br></br></br>![Pipeline](https://github.com/AndreyTokmakov/BookingService/blob/metadata/images/Actions_3.png)
