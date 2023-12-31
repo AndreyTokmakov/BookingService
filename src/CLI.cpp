@@ -81,7 +81,7 @@ namespace CLI
         }
         else {
             const std::vector<uint16_t> seats = service.getSeatsAvailable(theaterSelected.value() ,movieSelected.value());
-            outStream << "Theater: " << theaterSelected.value() << ", Movie : " << movieSelected.value()->name
+            outStream << "Theater: " << theaterSelected.value()->name << ", Movie : " << movieSelected.value()->name
                       << "\nSeats available: " << seats << std::endl;
         }
         return true;
